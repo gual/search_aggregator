@@ -1,0 +1,28 @@
+default: &default
+  google:
+    path: https://www.googleapis.com/customsearch/v1
+    search-parameter: q
+    query-parameters:
+      cx: 975e4e
+      key: RFRpbrCw
+    results:
+      path: items
+      title: title
+      url: link
+      snippet: snippet
+  bing:
+    path: https://api.cognitive.microsoft.com/bing/v7.0/search
+    search-parameter: q
+    headers:
+      ocp-apim-subscription-key: fdfa9d4a7b581fe4a8c4bb2fc218ca34
+    results:
+      path: webPages.value
+      title: name
+      url: url
+      snippet: snippet
+
+development:
+  <<: *default
+
+production:
+  <<: *default
