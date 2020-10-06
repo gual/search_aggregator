@@ -37,12 +37,12 @@ class Engine
     items_path = result_config[:path].split('.')
     items_path.each {|ip| items = items[ip]}
 
-    result = Array.new items.count
-    items.each do |item, i|
+    result = Array.new
+    items.each do |item|
       item_hash = Hash.new
       props.each {|prop| item_hash[prop] = item[result_config[prop]]}
       item_hash[:engine] = @key
-      result[i] = item_hash
+      result.push(item_hash)
     end
     result
   end
