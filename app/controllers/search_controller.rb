@@ -6,6 +6,6 @@ class SearchController < ApplicationController
     text = params[:text]
 
     engine = Engine.new(engine_key)
-    engine.search(text)
+    @result = engine.search(text)
   end
 end
