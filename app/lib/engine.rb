@@ -6,26 +6,39 @@ class Engine
   attr_accessor :config, :key
 
   def initialize(key)
-    raise 'Invalid engine' if not Rails.configuration.engines.key? key.to_sym
-
-    @key = key
-    @config = Rails.configuration.engines[key.to_sym]
+    if (key == 'both' || key == 'all')
+      @key = 'all'
+    elsif Rails.configuration.engines.key? key.to_sym
+      @key = key
+      @config = Rails.configuration.engines[key.to_sym]
+    else
+      raise 'Invalid engine'
+    end
   end
 
   def search(text)
-    params = @config[:'query-parameters'] || Hash.new
-    params[@config[:'search-parameter']] = text
-    headers = @config[:headers] || Hash.new
+    if @key == 'all'
+      all_results = Array.new
+      Rails.configuration.engines.keys.each do |engine_key|
+        engine = Engine.new(engine_key)
+        engine.search(text).each {|engine_result| all_results.push(engine_result)}
+      end
+      all_results
+    else
+      params = @config[:'query-parameters'] || Hash.new
+      params[@config[:'search-parameter']] = text
+      headers = @config[:headers] || Hash.new
 
-    uri = URI(@config[:path])
-    uri.query = URI.encode_www_form(params)
-    request = Net::HTTP::Get.new(uri)
-    headers.each {|k, v| request[k] = v}
+      uri = URI(@config[:path])
+      uri.query = URI.encode_www_form(params)
+      request = Net::HTTP::Get.new(uri)
+      headers.each {|k, v| request[k] = v}
 
-    response = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-      http.request(request)
+      response = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+        http.request(request)
+      end
+      format_result(response.body)
     end
-    format_result(response.body)
   end
 
   def format_result(resp_body)
