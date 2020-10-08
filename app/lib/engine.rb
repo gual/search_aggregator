@@ -23,6 +23,18 @@ class Engine
         engine = Engine.new(engine_key)
         engine.search(text).each {|engine_result| all_results.push(engine_result)}
       end
+
+      urls_found = Hash.new
+      all_results.each do |res|
+        if urls_found.has_key? res[:url]
+          urls_found[res[:url]] = urls_found[res[:url]] + 1
+          res[:counter] = urls_found[res[:url]]
+        else
+          urls_found[res[:url]] = 1
+          res[:counter] = 1
+        end
+      end
+
       all_results
     else
       params = @config[:'query-parameters'] || Hash.new
