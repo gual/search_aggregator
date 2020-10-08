@@ -26,14 +26,17 @@ class Engine
 
       urls_found = Hash.new
       all_results.each do |res|
-        if urls_found.has_key? res[:url]
-          urls_found[res[:url]] = urls_found[res[:url]] + 1
-          res[:counter] = urls_found[res[:url]]
+        url = res[:url]
+        if urls_found.has_key? url
+          urls_found[url] = urls_found[url] + 1
+          res[:counter] = urls_found[url]
         else
-          urls_found[res[:url]] = 1
+          urls_found[url] = 1
           res[:counter] = 1
         end
       end
+
+      all_results.keep_if {|r| r[:counter] == urls_found[r[:url]]}
 
       all_results
     else
